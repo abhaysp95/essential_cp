@@ -9,8 +9,7 @@ class Solution(object):
         """
         position.sort() 
 
-        low = 1
-        high = position[-1] - position[0]
+        low, high = 1, position[-1] - position[0]
         ans = 1
         while low <= high:
             mid = low + ((high - low) // 2)
@@ -26,6 +25,9 @@ class Solution(object):
     def canPlace(self, position: list[int], m: int, d: int) -> bool:
         placed = 1
         lastPlaced = position[0]
+
+        # since, constraints says balls >= 2
+        # we don't need to check for (placed == m) beforehand
         for i in range(1, len(position)):
             if position[i] - lastPlaced >= d:
                 lastPlaced = position[i]
