@@ -1,5 +1,5 @@
 class Solution(object):
-    def maxDistance(self, position, m):
+    def maxDistance(self, position: list[int], m: int) -> int:
         position.sort()
         d = 1
         last_placed = []
