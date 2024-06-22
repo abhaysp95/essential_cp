@@ -1,6 +1,36 @@
 from typing import List
 
 
+# Intution: we have two prefix-sum arrays
+# psum1 = prefix sum irrespective of grumpiness
+# psum2 = prefix sum when owner is not grumpy
+# At any minute i, we can get the max. satisfied customer by
+# adding from psum1 before the ith minute and after the (i + minute)th minute
+# and adding the range of i to (i + minute)th minute
+# for each index we can update the maximum which will be answer
+class SolutionPrefixSum:
+    def maxSatisfied(self, customers: List[int], grumpy: List[int], minutes: int) -> int:
+        psum1 = [0] * (len(customers) + 1)
+        psum2 = psum1.copy()
+        for i in range(len(customers)):
+            psum1[i + 1] = psum1[i]
+            psum1[i + 1] += customers[i]
+        for i in range(len(customers)):
+            psum2[i + 1] = psum2[i]
+            if grumpy[i] == 0:
+                psum2[i + 1] += customers[i]
+        print(f"psum1: {psum1}")
+        print(f"psum2: {psum2}")
+
+        res = 0
+        i = 0
+        while i + minutes < len(customers) + 1:
+            sum = psum2[i] + (psum1[i + minutes] - psum1[i]) + psum2[-1] - psum2[i + minutes];
+            res = max(res, sum)
+            i += 1
+
+        return res
+
 # Intution: get the window where customers are max satisfied.
 # Window will be of size minutes and max satisfied customer in that window should be the grumped customer,
 # because that will tell us that this much customer we will gain
@@ -66,7 +96,7 @@ def main():
     grumpy = [int(x) for x in line.split(',')]
     minutes = int(input())
 
-    solve = SolutionSlidingWindow().maxSatisfied(customers, grumpy, minutes)
+    solve = SolutionPrefixSum().maxSatisfied(customers, grumpy, minutes)
     print(solve)
 
 if __name__ == "__main__":
