@@ -67,3 +67,31 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# just for revision purpose
+def lower_bound(nums: List[int], key: int, lo: int = 0, hi: int | None = None):
+    if hi == None:
+        hi = len(nums)
+    hi -= 1
+
+    while lo <= hi:
+        mid = lo + ((hi - lo) // 2)
+        if nums[mid] < key:
+            lo = mid + 1
+        elif nums[mid] >= key:
+            hi = mid - 1
+    return lo
+
+def upper_bound(nums: List[int], key: int, lo: int = 0, hi: int | None = None):
+    if hi == None:
+        hi = len(nums)
+    hi -= 1
+
+    while lo <= hi:
+        mid = lo + ((hi - lo) // 2)
+        if nums[mid] <= key:
+            lo = mid + 1
+        elif nums[mid] > key:
+            hi = mid - 1
+    return lo
+
