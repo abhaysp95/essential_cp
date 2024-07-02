@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 
+from abc import ABCMeta, abstractmethod
 from typing import List
 from bisect import bisect_left, bisect_right
 
+# Solution interface
+class Solution(metaclass = ABCMeta):
+    @abstractmethod
+    def intersect(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        return NotImplementedError
+
+
 # trying to optimize
-class Solution:
+class OptimizedSolution(Solution):
     def intersect(self, nums1: List[int], nums2: List[int]) -> List[int]:
         # sort the array
         nums1.sort()
@@ -38,7 +46,7 @@ class Solution:
         return res
 
 # initial approach
-class OldSolution:
+class OldSolution(Solution):
     def intersect(self, nums1: List[int], nums2: List[int]) -> List[int]:
         res: List[int] = []
         for num in nums1:
@@ -54,7 +62,7 @@ class OldSolution:
 def main():
     lst1: List[int] = [int(x) for x in input()[1:][:-1].split(",")]
     lst2: List[int] = [int(x) for x in input()[1:][:-1].split(",")]
-    solve: Solution = Solution()
+    solve: Solution = OptimizedSolution()
     print(solve.intersect(lst1, lst2))
 
 if __name__ == "__main__":
