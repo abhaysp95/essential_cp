@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from abc import ABCMeta, abstractmethod
 from typing import List, Optional
 
 # Definition for singly-linked list.
@@ -8,7 +9,13 @@ class ListNode:
         self.val = val
         self.next = next
 
-class Solution:
+class Solution(metaclass = ABCMeta):
+    @abstractmethod
+    def mergeNodes(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        return NotImplementedError
+
+# the solution creates a new resultant list
+class SolutionCreatingNewList(Solution):
     def mergeNodes(self, head: Optional[ListNode]) -> Optional[ListNode]:
         if head == None or head.next == None:
             return head
@@ -30,6 +37,29 @@ class Solution:
 
         return new_head.next
 
+# the solution makes changes in existing list
+class SolutionWithExistingList(Solution):
+    def mergeNodes(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if head == None or head.next == None:
+            return head
+
+        prev, cur = head, head.next
+        sum = 0
+        while cur != None:
+            if cur.val == 0:
+                prev.val = sum
+                if cur.next != None:
+                    prev.next = cur
+                    prev = prev.next
+                else:
+                    prev.next = None
+                sum = 0
+            else:
+                sum += cur.val
+            cur = cur.next
+        return head
+
+
 def make_ll(arr: List[int]) -> Optional[ListNode]:
     head = ListNode()
     cur = head
@@ -42,7 +72,6 @@ def make_ll(arr: List[int]) -> Optional[ListNode]:
 
 
 def print_ll(head: Optional[ListNode]):
-    print("Printing List:")
     if head == None:
         return
     cur = head
@@ -57,11 +86,11 @@ def print_ll(head: Optional[ListNode]):
 def main():
     lst = [int(x) for x in input()[1:][:-1].split(",")]
     head = make_ll(lst)
-    print("Formed list:", end="")
+    print("Formed list: ", end="")
     print_ll(head)
-    solve = Solution()
+    solve = SolutionWithExistingList()
     res_head = solve.mergeNodes(head)
-    print("Resultant list:", end="")
+    print("Resultant list: ", end="")
     print_ll(res_head)
     
 
