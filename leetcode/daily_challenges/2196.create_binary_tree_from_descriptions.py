@@ -30,9 +30,15 @@ def traverse(root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
 def print_tree(root: Optional[TreeNode]):
     if root == None:
         return
-    print_tree(root.left)
     print(f" {root.val} ", end="")
-    print_tree(root.right)
+    if root.left != None:
+        print_tree(root.left)
+    else:
+        print(" null ", end="")
+    if root.right != None:
+        print_tree(root.right)
+    else:
+        print(" null ", end="")
 
 class Solution:
     def createBinaryTree(self, description: List[List[int]]) -> Optional[TreeNode]:
@@ -46,14 +52,14 @@ class Solution:
             for i, root in enumerate(parents):
                 print(f"finding parent: {single[0]} in {root.val}")
                 parent = traverse(root, single[0])
-                print(f"returned parent: {parent.val if parent != None else "None"}")
+                print(f"returned parent: {parent.val if parent != None else 'None'}")
                 if parent != None:
                     pidx = i
                     break
             for i, root in enumerate(parents):
                 print(f"finding child: {single[1]} in {root.val}")
                 child = traverse(root, single[1])
-                print(f"returned child: {child.val if child != None else "None"}")
+                print(f"returned child: {child.val if child != None else 'None'}")
                 if child != None:
                     cidx = i
                     break
@@ -62,6 +68,7 @@ class Solution:
                     parent.left = child
                 else:
                     parent.right = child
+                print(f"[!p & !c] remove the parent link p {parent.val} to c {child.val}")
                 parents = parents[:cidx] + parents[cidx + 1:]
                 for root in parents:
                     print_tree(root)
@@ -86,11 +93,11 @@ class Solution:
                     raise RootNotFoundError
                 print(f"Child found: {root.val}")
                 if single[2]:
-                    parent.left = root
+                    parent.left = child
                 else:
-                    parent.right = root
+                    parent.right = child
                 root = parent
-                parents[pidx] = root
+                parents[cidx] = root
                 for root in parents:
                     print_tree(root)
                     print("\n")
