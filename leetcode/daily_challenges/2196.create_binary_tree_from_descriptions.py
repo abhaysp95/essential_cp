@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 
-from typing import List, Optional
+from abc import ABCMeta, abstractmethod
+from typing import Deque, Dict, List, Optional, Set
 
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
         self.left = left
         self.right = right
+
+class Solution(metaclass = ABCMeta):
+    @abstractmethod
+    def createBinaryTree(self, description: List[List[int]]) -> Optional[TreeNode]:
+        pass
+
 
 class RootNotFoundError(Exception):
     pass
@@ -40,7 +47,8 @@ def print_tree(root: Optional[TreeNode]):
     else:
         print(" null ", end="")
 
-class Solution:
+# Getting "Time Limit Exceeded"
+class SequentialTreeFormingSolution(Solution):
     def createBinaryTree(self, description: List[List[int]]) -> Optional[TreeNode]:
         root: Optional[TreeNode] = None
         parents: List[TreeNode] = []
@@ -91,6 +99,62 @@ class Solution:
                     parent.right = child
         return parents[0]
 
+class FindingParentSolution(Solution):
+    def createBinaryTree(self, description: List[List[int]]) -> Optional[TreeNode]:
+        q = Deque()
+        d: Dict[int, List[Optional[int]]] = dict()
+        for info in description:
+            if info[0] not in d:
+                d[info[0]] = [None, None]
+            if info[2] == 0:
+                d[info[0]][1] = info[1] # right
+            else:
+                d[info[0]][0] = info[1] # left
+
+        # find the root node first
+        root: Optional[TreeNode] = None
+        for key in d.keys():
+            found = False
+            for values in d.values():
+                print(f"looking {key} in {values}")
+                if key in values:
+                    found = True
+            if not found:
+                root = TreeNode(key)
+
+        if root == None:
+            raise RootNotFoundError
+        print(f"root: {root.val}")
+
+        for i, value in enumerate(d[root.val]):
+            if i == 0 and value != None:
+                root.left = TreeNode(value)
+                q.append(root.left)
+            elif i == 1 and value != None:
+                root.right = TreeNode(value)
+                q.append(root.right)
+
+        # debug
+        for ele in q:
+            print(f"parent: {ele.val}")
+
+
+        while len(q) != 0:
+            parent = q.pop()
+            print(f"making for parent: {parent.val}")
+            if parent.val not in d:
+                continue
+            values = d[parent.val]
+            for i, value in enumerate(values):
+                if i == 0 and value != None:
+                    parent.left = TreeNode(value)
+                    q.append(parent.left)
+                elif i == 1 and value != None:
+                    parent.right = TreeNode(value)
+                    q.append(parent.right)
+
+        return root
+
 def main():
     given = input()[1:][:-1].split("],")
     desc: List[List[int]] = []
@@ -99,12 +163,12 @@ def main():
             desc.append([int(x) for x in single[1:][:-1].split(",")])
         else:
             desc.append([int(x) for x in single[1:].split(",")])
-    solve = Solution()
+    solve = FindingParentSolution()
     root: Optional[TreeNode] = solve.createBinaryTree(desc)
 
     print("Final tree:")
     print_tree(root)
-    print("----------")
+    print("\n----------")
 
 if __name__ == "__main__":
     main()
