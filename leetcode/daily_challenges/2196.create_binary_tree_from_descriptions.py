@@ -99,6 +99,7 @@ class SequentialTreeFormingSolution(Solution):
                     parent.right = child
         return parents[0]
 
+# Getting TLE on this one too
 class FindingParentSolution(Solution):
     def createBinaryTree(self, description: List[List[int]]) -> Optional[TreeNode]:
         q = Deque()
@@ -155,6 +156,28 @@ class FindingParentSolution(Solution):
 
         return root
 
+class OptimizedSolution(Solution):
+    def createBinaryTree(self, description: List[List[int]]) -> Optional[TreeNode]:
+        nodeHash: Dict[int, TreeNode] = {}
+        childNodes: Set[int] = set()
+        for info in description:
+            childNodes.add(info[1])
+            if info[0] not in nodeHash:
+                nodeHash[info[0]] = TreeNode(info[0])
+            if info[1] not in nodeHash:
+                nodeHash[info[1]] = TreeNode(info[1])
+
+            if info[2]:
+                nodeHash[info[0]].right = nodeHash[info[1]]
+            else:
+                nodeHash[info[0]].left = nodeHash[info[1]]
+
+        for info in description:
+            if info[0] not in childNodes:
+                return nodeHash[info[0]]
+
+        raise RootNotFoundError
+
 def main():
     given = input()[1:][:-1].split("],")
     desc: List[List[int]] = []
@@ -163,7 +186,7 @@ def main():
             desc.append([int(x) for x in single[1:][:-1].split(",")])
         else:
             desc.append([int(x) for x in single[1:].split(",")])
-    solve = FindingParentSolution()
+    solve = OptimizedSolution()
     root: Optional[TreeNode] = solve.createBinaryTree(desc)
 
     print("Final tree:")
