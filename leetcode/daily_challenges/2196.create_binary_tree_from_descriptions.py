@@ -47,19 +47,13 @@ class Solution:
         for single in description:
             parent, child = None, None
             pidx, cidx = -1, -1
-            print("existing parents: ")
-            print([root.val for root in parents])
             for i, root in enumerate(parents):
-                print(f"finding parent: {single[0]} in {root.val}")
                 parent = traverse(root, single[0])
-                print(f"returned parent: {parent.val if parent != None else 'None'}")
                 if parent != None:
                     pidx = i
                     break
             for i, root in enumerate(parents):
-                print(f"finding child: {single[1]} in {root.val}")
                 child = traverse(root, single[1])
-                print(f"returned child: {child.val if child != None else 'None'}")
                 if child != None:
                     cidx = i
                     break
@@ -68,14 +62,8 @@ class Solution:
                     parent.left = child
                 else:
                     parent.right = child
-                print(f"[!p & !c] remove the parent link p {parent.val} to c {child.val}")
                 parents = parents[:cidx] + parents[cidx + 1:]
-                for root in parents:
-                    print_tree(root)
-                    print("\n")
-                print("--------------")
             elif parent == None and child == None:
-                print("Both parent and child not found")
                 root = TreeNode(single[0])
                 child = TreeNode(single[1])
                 if single[2]:
@@ -83,39 +71,25 @@ class Solution:
                 else:
                     root.right = child
                 parents.append(root)
-                for root in parents:
-                    print_tree(root)
-                    print("\n")
-                print("--------------")
             elif parent == None:
                 parent = TreeNode(single[0])
                 if root == None:
                     raise RootNotFoundError
-                print(f"Child found: {root.val}")
                 if single[2]:
                     parent.left = child
                 else:
                     parent.right = child
                 root = parent
                 parents[cidx] = root
-                for root in parents:
-                    print_tree(root)
-                    print("\n")
-                print("--------------")
             else:
                 child = TreeNode(single[1])
                 if root == None:
                     raise RootNotFoundError
-                print(f"parent found: {parent.val}")
                 if single[2]:
                     parent.left = child
                 else:
                     parent.right = child
-                for root in parents:
-                    print_tree(root)
-                    print("\n")
-                print("--------------")
-        return root
+        return parents[0]
 
 def main():
     given = input()[1:][:-1].split("],")
