@@ -1,13 +1,34 @@
 #!/usr/bin/env python3
 
+import cProfile
 from collections import deque
-from typing import List, Optional
+from typing import List, Optional, Union
 
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
         self.left = left
         self.right = right
+
+class TRwithParent:
+    def __init__(self, val=0, parent=None, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+        self.parent = parent
+
+def convert_tree_to_with_parent(root, new_root):
+    if root == None:
+        return None
+    if root.left != None:
+        new_root.left = TRwithParent(root.left.val)
+        new_root.left.parent = new_root
+        convert_tree_to_with_parent(root.left, new_root.left)
+    if root.right != None:
+        new_root.right = TRwithParent(root.right.val)
+        new_root.right.parent = new_root
+        convert_tree_to_with_parent(root.right, new_root.right)
+    return new_root
 
 def make_tree_from_level_order_traversal(nodes: List[str]) -> Optional[TreeNode]:
     if len(nodes) == 0 or nodes[0] == 'null':
@@ -53,6 +74,29 @@ def perform_level_order_traversal(root: Optional[TreeNode]) -> List[str]:
         idx -= 1
     return nodes[:idx + 1]
 
+def perform_level_order_traversal_with_parent(root: Optional[TRwithParent]) -> List[List[str]]:
+    if root == None:
+        return []
+    nodes = [[str(root.val), 'null']]
+    q = deque()
+    q.append(root)
+
+    while len(q):
+        p = q.popleft()
+        if p.left != None:
+            q.append(p.left)
+        nodes.append(['null', 'null'] if p.left == None else [str(p.left.val), 'null' if p.left.parent == None else str(p.left.parent.val)])
+        if p.right != None:
+            q.append(p.right)
+        nodes.append(['null', 'null'] if p.right == None else [str(p.right.val), 'null' if p.right.parent == None else str(p.right.parent.val)])
+
+    idx = len(nodes) - 1
+    while idx >= 0:
+        if nodes[idx][0] != 'null':
+            break
+        idx -= 1
+    return nodes[:idx + 1]
+
 
 
 def get_lowest_common_ancestor(root, val1, val2):
@@ -70,7 +114,8 @@ def get_lowest_common_ancestor(root, val1, val2):
         return l
     return None
 
-depth_dict = {}
+depth_dict = {} # to memoize finding depth of node
+adj_dict = {} # to memoize the check whether a node exists in a tree/sub-tree
 
 def get_depth(root, val):
     if root == None:
@@ -87,22 +132,35 @@ def get_depth(root, val):
         return d + 1
     return 0
 
+def get_parents(node):
+    if node == None:
+        return [];
+    plist = []
+    while node != None:
+        if node.parent != None:
+            plist.append(node.parent)
+        node = node.parent
+    return plist
 
-# TODO: memoize the depth (check beforehand, and check inside the get_depth also while getting depth)
-
-
-INF = int(1e9 + 7)
+def node_exists(root, node) -> bool:
+    if root == None:
+        return False
+    if root == node:
+        return True
+    if root in adj_dict:
+        if node in adj_dict[root]:
+            return True
+    return node_exists(root.left, node) or node_exists(root.right, node)
 
 class Solution:
     # the strategy fails because values in nodes are not unique, the thus the value of lca we get is wrong
-    def countPairs(self, root: TreeNode, distance: int) -> int:
+    def countPairs(self, root: Union[TreeNode, TRwithParent], distance: int) -> int:
         leaf_nodes = []
         count = 0
 
         def get_leaf_nodes(root):
             if root == None:
                 return
-            print(f"root: {root.val}")
             if root.left == None and root.right == None:
                 leaf_nodes.append(root)
             if root.left != None:
@@ -111,30 +169,33 @@ class Solution:
                 get_leaf_nodes(root.right)
 
         get_leaf_nodes(root)
-        print(f"len: {len(leaf_nodes)}")
 
         for i in range(len(leaf_nodes)):
+            parent_list = get_parents(leaf_nodes[i])
             for j in range(i, len(leaf_nodes)):
                 if i == j:
                     continue
-                lca_node = get_lowest_common_ancestor(root, leaf_nodes[i], leaf_nodes[j])
-                if lca_node == None:
-                    raise Exception("Should get lca node")
+                for parent in parent_list:
+                    found = False
+                    if node_exists(parent, leaf_nodes[j]):
+                        if parent not in adj_dict:
+                            adj_dict[parent] = []
+                        if leaf_nodes[j] not in adj_dict[parent]:
+                            adj_dict[parent].append(leaf_nodes[j])
+                        found = True
+                        depth_x = get_depth(parent, leaf_nodes[i])
+                        if (parent, leaf_nodes[i]) not in depth_dict:
+                            depth_dict[(parent, leaf_nodes[i])] = depth_x
+                        depth_x -= 1 # don't include self
+                        depth_y = get_depth(parent, leaf_nodes[j])
+                        if (parent, leaf_nodes[j]) not in depth_dict:
+                            depth_dict[(parent, leaf_nodes[j])] = depth_y
+                        depth_y -= 1 # don't include self
+                        if depth_x + depth_y <= distance:
+                            count += 1
+                    if found:
+                        break
 
-                # get depth for first node
-                depth_x = get_depth(lca_node, leaf_nodes[i])
-                if (lca_node, leaf_nodes[i]) not in depth_dict:
-                    depth_dict[(lca_node, leaf_nodes[i])] = depth_x
-                depth_x -= 1 # don't include self
-
-                # get depth for second node
-                depth_y = get_depth(lca_node, leaf_nodes[j])
-                if (lca_node, leaf_nodes[j]) not in depth_dict:
-                    depth_dict[(lca_node, leaf_nodes[j])] = depth_y
-                depth_y -= 1
-                print(f"x: {leaf_nodes[i].val}, y: {leaf_nodes[j].val}, lca: {lca_node.val}, dx: {depth_x}, dy: {depth_y}")
-                if depth_x + depth_y <= distance:
-                    count += 1
         return count
 
 
@@ -143,14 +204,34 @@ def main():
     node_list = [x for x in line[0][1:][:-1].split(",")]
     dist_atleast = int(line[1])
     root = make_tree_from_level_order_traversal(node_list)
-    print(perform_level_order_traversal(root))
+    # print(perform_level_order_traversal(root))
     if root == None:
         raise Exception("Root should be found")
+    new_root = TRwithParent(root.val)
+    convert_tree_to_with_parent(root, new_root)
+    # new_node_list = perform_level_order_traversal_with_parent(new_root)
+    # print("\n", new_node_list, sep = " ")
+    # print(f"{len(node_list)}, {len(new_node_list)}")
+
+    # if new_root == None:
+    #     raise Exception("Root should be found")
+    # if new_root.left == None:
+    #     raise Exception("Root should be found")
+    # if new_root.right == None:
+    #     raise Exception("Root should be found")
+    # if new_root.left.right == None:
+    #     raise Exception("Root should be found")
+    # print(new_root.val)
+    # print(new_root.left.parent.val)
+    # print(new_root.right.parent.val)
+    # print(new_root.left.right.val)
+
     solve = Solution()
-    print(solve.countPairs(root, dist_atleast))
+    print(solve.countPairs(new_root, dist_atleast))
 
 if __name__ == "__main__":
-    main()
+    cProfile.run('main()')
+    # main()
 
 # input: [1,2,3,4,5,6,7] 3
 # input: [7,1,4,6,null,5,3,null,null,null,null,null,2] 3
