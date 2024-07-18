@@ -136,10 +136,12 @@ def get_parents(node):
     if node == None:
         return [];
     plist = []
+    dist = 1
     while node != None:
         if node.parent != None:
-            plist.append(node.parent)
+            plist.append([node.parent, dist])
         node = node.parent
+        dist += 1
     return plist
 
 def node_exists(root, node) -> bool:
@@ -172,24 +174,32 @@ class Solution:
 
         for i in range(len(leaf_nodes)):
             parent_list = get_parents(leaf_nodes[i])
+            for pinfo in parent_list:
+                print(pinfo[0].val, pinfo[1])
             for j in range(i, len(leaf_nodes)):
                 if i == j:
                     continue
-                for parent in parent_list:
+                for pinfo in parent_list:
                     found = False
-                    if node_exists(parent, leaf_nodes[j]):
-                        if parent not in adj_dict:
-                            adj_dict[parent] = []
-                        if leaf_nodes[j] not in adj_dict[parent]:
-                            adj_dict[parent].append(leaf_nodes[j])
+                    if node_exists(pinfo[0], leaf_nodes[j]):
+                        if pinfo[0] not in adj_dict:
+                            adj_dict[pinfo[0]] = [leaf_nodes[i]]
+                        if leaf_nodes[j] not in adj_dict[pinfo[0]]:
+                            adj_dict[pinfo[0]].append(leaf_nodes[j])
                         found = True
-                        depth_x = get_depth(parent, leaf_nodes[i])
-                        if (parent, leaf_nodes[i]) not in depth_dict:
-                            depth_dict[(parent, leaf_nodes[i])] = depth_x
-                        depth_x -= 1 # don't include self
-                        depth_y = get_depth(parent, leaf_nodes[j])
-                        if (parent, leaf_nodes[j]) not in depth_dict:
-                            depth_dict[(parent, leaf_nodes[j])] = depth_y
+                        # depth_x = get_depth(pinfo[0], leaf_nodes[i])
+                        # if depth_x != pinfo[1]:
+                        #     print(f"parent: {pinfo[0].val}, leaf[i]: {leaf_nodes[i].val}, pinfo[1]: {pinfo[1]}, depth_x: {depth_x}")
+                        depth_x = pinfo[1]
+                        if (pinfo[0], leaf_nodes[i]) not in depth_dict:
+                            depth_dict[(pinfo[0], leaf_nodes[i])] = depth_x
+# TODO: Further optimization could be to get the depth from leaf_nodes[i] to parent, when we are using get_parents(i)
+# and to do the same for leaf_nodes[j] when we are operating on node_exists() method
+# NOTE: Checked a little bit. First part seems alright, but for second part getting some unexpected things
+                        # depth_x -= 1 # don't include self
+                        depth_y = get_depth(pinfo[0], leaf_nodes[j])
+                        if (pinfo[0], leaf_nodes[j]) not in depth_dict:
+                            depth_dict[(pinfo[0], leaf_nodes[j])] = depth_y
                         depth_y -= 1 # don't include self
                         if depth_x + depth_y <= distance:
                             count += 1
