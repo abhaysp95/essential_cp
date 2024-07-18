@@ -70,11 +70,15 @@ def get_lowest_common_ancestor(root, val1, val2):
         return l
     return None
 
+depth_dict = {}
+
 def get_depth(root, val):
     if root == None:
         return 0
     if root == val:
         return 1
+    if (root, val) in depth_dict:
+        return depth_dict[(root, val)]
     d = get_depth(root.left, val)
     if d:
         return d + 1
@@ -116,8 +120,18 @@ class Solution:
                 lca_node = get_lowest_common_ancestor(root, leaf_nodes[i], leaf_nodes[j])
                 if lca_node == None:
                     raise Exception("Should get lca node")
-                depth_x = get_depth(lca_node, leaf_nodes[i]) - 1
-                depth_y = get_depth(lca_node, leaf_nodes[j]) - 1
+
+                # get depth for first node
+                depth_x = get_depth(lca_node, leaf_nodes[i])
+                if (lca_node, leaf_nodes[i]) not in depth_dict:
+                    depth_dict[(lca_node, leaf_nodes[i])] = depth_x
+                depth_x -= 1 # don't include self
+
+                # get depth for second node
+                depth_y = get_depth(lca_node, leaf_nodes[j])
+                if (lca_node, leaf_nodes[j]) not in depth_dict:
+                    depth_dict[(lca_node, leaf_nodes[j])] = depth_y
+                depth_y -= 1
                 print(f"x: {leaf_nodes[i].val}, y: {leaf_nodes[j].val}, lca: {lca_node.val}, dx: {depth_x}, dy: {depth_y}")
                 if depth_x + depth_y <= distance:
                     count += 1
