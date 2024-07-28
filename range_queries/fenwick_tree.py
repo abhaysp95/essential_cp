@@ -9,6 +9,16 @@ j = int(input())
 
 # NOTE: actual n = len(arr) - 1
 
+# NOTE: if you don't remember that "bitwise and" two's compliment of the number with itself gives lsb
+def get_lsb(num):
+    if num == 0:
+        return 0 # caller should be careful cause this could lead to infinite loop for caller
+    i = 0
+    while True:
+        if num & (1 << i):
+            return 1 << i
+        i += 1
+
 # make fenwick tree in O(nlog(n)) time, basically follows the same approach to point update
 def make_fenwick_tree_naively(arr):
     tree = [0] * len(arr)
@@ -32,7 +42,7 @@ def make_fenwick_tree(arr):
     for i in range(1, len(arr)):
         x = i
         tree[i] += arr[x]
-        i += i & -i;
+        i += i & -i
         if i < len(arr):
             tree[i] += tree[x] # cascading effect
 
