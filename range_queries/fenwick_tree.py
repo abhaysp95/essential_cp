@@ -4,8 +4,10 @@
 
 # adding 0 at start to make this 1-based index
 arr = [0] + list(map(int, input().split(",")))
-i = int(input())
-j = int(input())
+i = int(input()) # range start
+j = int(input()) # range end
+q = int(input()) # count for update point operation
+
 
 # NOTE: actual n = len(arr) - 1
 
@@ -66,5 +68,24 @@ def get_range_sum(i, j, tree):
         return 0  # or probably raise error
     return get_sum_for_node(j, tree) - get_sum_for_node(i - 1, tree)
 
+# NOTE: this function is basically the same as how we make fenwick tree the naive way
+# or you can consider the statement for vice-versa
+def make_update_point_change(idx, val, tree):
+    while idx < len(tree):
+        # NOTE: this could also be a simple assignment operation
+        # in that case, increment tree[idx] += val - tree[idx]
+        tree[idx] += val
+        idx += idx & -idx
+
 tree = make_fenwick_tree(arr)
-print(get_range_sum(i, j, tree))
+print(tree)
+print("initial range sum:", get_range_sum(i, j, tree))
+
+while q:
+    # NOTE: x is index and thus it should be 1-based (confirm this in constraint of question)
+    x, val = list(map(int, input().split(" ")))
+    print("x, val:", x, val)
+    make_update_point_change(x, val, tree)
+    print(tree)
+    print(get_range_sum(i, j, tree))
+    q -= 1
