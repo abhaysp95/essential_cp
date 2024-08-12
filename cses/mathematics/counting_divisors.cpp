@@ -1,5 +1,6 @@
 
 #include <cstdio>
+#include <vector>
 using namespace std;
 
 // recieved TLE (because there are multiple test cases)
@@ -24,6 +25,9 @@ int divisor_pairs(int n) {
   return c;
 }
 
+// Time-complexity: O(sqrt(n)) because each division reduces n significantly and
+// so the division is limit, we don't need to consider it
+// If we add the test-cases the time-complexity is O(t*sqrt(n))
 int by_prime_factorization(int n) {
   int c=1; 
   for (int i=2; i*i<=n; i++) {
@@ -41,6 +45,40 @@ int by_prime_factorization(int n) {
   // factors and added +1 when n>1 was true
   if (n>1) c*=2;
 
+  return c;
+}
+
+#define SZ (int)1e6+1
+vector<int> pdivides(SZ,0);
+void precompute_prime_divisors() {
+  pdivides[1] = 1;
+  for (int i = 2; i<=SZ; i++) {
+    int k=i;
+    if (pdivides[k]==0) {
+      while (k<=SZ) {
+        pdivides[k]=i;
+        k+=i;
+      }
+    }
+  }
+}
+
+// Time-complexity: Doing precomputation will take O(nlog(n))
+// and then for computing divisors for n will only take O(log(n))
+// so, total complexity will be: O(nlog(n))+O(tlog(n))
+// This is better when number are more on larger side
+int optimized_prime_factorization(int n) {
+  int c=1;
+  int d=pdivides[n];
+  while (n>1) {
+    int tc=0;
+    while (n%d==0) {
+      n/=d;
+      tc++;
+    }
+    if (tc) c*=tc+1;
+    d=pdivides[n];
+  }
   return c;
 }
 
