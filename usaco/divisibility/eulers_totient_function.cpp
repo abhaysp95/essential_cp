@@ -35,10 +35,24 @@ void precompute_phi_function() {
   }
 }
 
+// same as above
+void precompute_phi_function2() {
+  pre[1]=1;
+  for (int i=2; i<SZ; i++)
+    pre[i]=i;
+
+  for (int i=2; i<=SZ; i++) {
+    if (pre[i]==i) {
+      for (int j=i; j<=SZ; j+=i)
+        pre[j]-=pre[j]/i;
+    }
+  }
+}
+
 int main(void) {
   int t=0;
   scanf("%d", &t);
-  precompute_phi_function();
+  precompute_phi_function2();
   while (t--) {
     int n;
     scanf("%d", &n);
