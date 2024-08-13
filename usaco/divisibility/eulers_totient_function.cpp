@@ -20,13 +20,29 @@ void with_prime_factorization_method(int n) {
   printf("%d\n", res);
 }
 
+#define SZ (int)1e5+1
+vector<int> pre(SZ, 0);
+void precompute_phi_function() {
+  pre[1]=1;
+  for (int i=2; i<SZ; i++)
+    pre[i]=i-1;
+
+  for (int i=2; i<=SZ; i++) {
+    if (pre[i]==i-1) {
+      for (int j=2*i; j<=SZ; j+=i)
+        pre[j]-=pre[j]/i;
+    }
+  }
+}
+
 int main(void) {
   int t=0;
   scanf("%d", &t);
+  precompute_phi_function();
   while (t--) {
     int n;
     scanf("%d", &n);
-    with_prime_factorization_method(n);
+    printf("%d\n", pre[n]);
   }
   return 0;
 }
