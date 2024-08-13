@@ -20,8 +20,11 @@ void with_prime_factorization_method(int n) {
   printf("%d\n", res);
 }
 
+// time-complexity: O(nloglogn)
 #define SZ (int)1e5+1
 vector<int> pre(SZ, 0);
+// this method is beneficial if we can use this precomputation array multiple
+// times, thus getting in O(1) time after precompute
 void precompute_phi_function() {
   pre[1]=1;
   for (int i=2; i<SZ; i++)
@@ -49,10 +52,24 @@ void precompute_phi_function2() {
   }
 }
 
+// it says, sum of phi(d) all d where d is one of the divisor of n, is going to
+// be n
+// time-complexity: O(nlogn)
+void precompute_divisibility_pair_method() {
+  pre[1]=1;
+  for (int i=0; i<SZ; i++)
+    pre[i]=i-1;
+
+  for (int i=2; i<=SZ; i++) {
+    for (int j=2*i; j<=SZ; j+=i)
+      pre[j]-=pre[i];
+  }
+}
+
 int main(void) {
   int t=0;
   scanf("%d", &t);
-  precompute_phi_function2();
+  precompute_divisibility_pair_method();
   while (t--) {
     int n;
     scanf("%d", &n);
