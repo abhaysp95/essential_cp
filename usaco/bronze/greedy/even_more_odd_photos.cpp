@@ -26,6 +26,9 @@ void solve() {
   int oz=odd.size(),ez=even.size();
 
   int g=0;
+  if (oz>ez) {
+    if ((oz-ez)%3==1) oz-=2;
+  }
   if (oz==ez) {
     g=oz*2;
   } else if (ez>oz) {
@@ -40,8 +43,10 @@ void solve() {
     if (rem==2) {
       g++;
     } else {
-      g--;  // in odd, instead of using 1, using 3 odds to make it one
+      // shouldn't reach here
+      // g--;  // in odd, instead of using 1, using 3 odds to make it one
       // odd group
+      // already used this logic in ln.20
     }
   }
 
