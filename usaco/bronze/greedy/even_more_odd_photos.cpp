@@ -47,6 +47,9 @@ void solve() {
       // g--;  // in odd, instead of using 1, using 3 odds to make it one
       // odd group
       // already used this logic in ln.20
+      // my guess that this here didn't work because when we make 3 odd
+      // to 1, it's possible that oz becomes less than ez and so
+      // confirming and changing this beforehand is the correct way
     }
   }
 
