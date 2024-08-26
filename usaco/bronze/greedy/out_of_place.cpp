@@ -102,10 +102,32 @@ void solve2() {
   fout << r-l << '\n';
 }
 
+// simplified form of solve2
+void solve3() {
+  int n;
+  fin >> n;
+  vector<int> place(n);
+  for (int i=0;i<n;i++)
+    fin >> place[i];
+
+  vector<int> place2(place);
+  sort(place2.begin(), place2.end());
+
+  int swaps=-1; // each swap will fix position by 1
+  for (int i=0;i<n;i++) {
+    // when element is repeated in place, there will exist case in between
+    // where place[i]==place2[i]
+    // for this case, swaps will not increase meaning they are already in
+    // correct place, so no need to worry about duplicate (like in solve2)
+    if (place[i]!=place2[i]) swaps++;
+  }
+  fout << swaps << '\n';
+}
+
 int32_t main(void) {
   FAST_IO;
 
-		solve2();
+		solve3();
 
 	return 0;
 }
