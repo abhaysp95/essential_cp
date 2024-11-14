@@ -1,10 +1,22 @@
 // methods which would read (nested) list for leetcode input
 
+#include <iostream>
 #include <cassert>
 #include <sstream>
 #include <string>
+#include <format>
 #include <type_traits>
 #include <vector>
+
+#define ASSERT_MSG(condition, msg)                                             \
+  do {                                                                         \
+    if (!(condition)) {                                                        \
+      std::cerr << std::format(                                                \
+          "Assertion failed: {}, {}\nFile: {}, line: {}\n", #condition, msg,   \
+          __FILE__, __LINE__);                                                 \
+      std::abort();                                                            \
+    }                                                                          \
+  } while (0)
 
 template<typename T>
 concept Numeric = std::is_arithmetic_v<T>;
@@ -25,7 +37,7 @@ T get_num_from_string(const std::string& s) {
 template<Numeric T>
 std::vector<T> read_vector(std::string& str) {
   std::vector<T> vec{};
-  assert(str[0] != '[' && "Argument format should be [1,2,3]");
+  ASSERT_MSG(str[0] == '[', "List should be passed as [1,2,3,...]");
   str = str.substr(1, str.size()-1);
   std::istringstream istream{str};
   for (std::string s{}; getline(istream, s, ',');) {
@@ -39,9 +51,9 @@ std::vector<T> read_vector(std::string& str) {
 //
 // NOTE: the method will make change in the passed string argument
 template<Numeric T>
-std::vector<std::vector<T>> read_vector(std::string& str) {
+std::vector<std::vector<T>> read_vector_2d(std::string& str) {
   std::vector<std::vector<T>> res{};
-  assert(str[0] != '[' && "Argument format should be [[1,2],[3],...]");
+  ASSERT_MSG(str[0] == '[', "Argument format should be [[1,2],[3],...]");
   str = str.substr(1,str.size()-1);
   std::istringstream istream{str};
   for (std::string s{}; getline(istream, s, ']');) {
