@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#include "../../lc_list.hpp"
+#include <lc_list.hpp>
 
 using namespace std;
 
