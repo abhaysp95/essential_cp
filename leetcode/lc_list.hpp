@@ -1,4 +1,6 @@
 // methods which would read (nested) list for leetcode input
+#ifndef __LC_LIST_INCLUDED__
+#define __LC_LIST_INCLUDED__
 
 #include <iostream>
 #include <cassert>
@@ -74,3 +76,5 @@ std::vector<std::vector<T>> read_vector_2d(std::string& str) {
 // NOTE: try using both these methods with auto, and see if compiler is able to
 // deduce based solely on the return type. As unlike java, C++ allows function
 // overloading based on unambiguity which is combination of return type + parameters
+
+#endif
