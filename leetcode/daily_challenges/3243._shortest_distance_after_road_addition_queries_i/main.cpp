@@ -13,34 +13,53 @@ using namespace std;
 ifstream fin("");
 ofstream fout("");
 
+// NOTE: BFS is used here to find the shortest path on unweighted graph 
 class Solution {
   using ll = long long;
 public:
+  ll min_distance(vector<vector<ll>>& adj) {
+    queue<pair<ll, ll>> q{};
+    // adj graph can be cyclical
+    vector<bool> visited(adj.size(), false);
+    q.push({0, 0});
+    visited[0]=true;
+    ll minl = 1e9;
+    while (!q.empty()) {
+      auto [cp, cl] = q.front();
+      q.pop();
+      if (cp==adj.size()-1) {
+        minl = min(minl, cl);
+      }
+      for (auto &x: adj[cp]) {
+        if (!visited[x]) {
+          q.push({x, cl+1});
+          visited[x]=true;
+        }
+      }
+    }
+    return minl;
+  }
   vector<int> shortestDistanceAfterQueries(int n, vector<vector<int>>& queries) {
-    vector<set<ll>> adj(n);
+    vector<vector<ll>> adj(n);
+    for (ll i=0; i<n-1; i++) {
+      adj[i].push_back(i+1);
+    }
     vector<int> res{};
     for (auto &q: queries) {
-      adj[q[0]].insert(q[1]);
-      ll i=0,l=0;
-      while (i<n-1) { // once reaching n-1, it shouldn't iterate
-        if (adj[i].empty()) i++;
-        else {
-          i=*(adj[i].rbegin());
-        }
-        l++;
-#ifdef NDEBUG
-        cout << format("l: {}, i: {}\n", l, i);
-#endif
-      }
-      res.push_back(l);
+      adj[q[0]].push_back(q[1]);
 #ifdef NDEBUG
       for (ll i=0; i<n; i++) {
         cout << i << ": ";
-        for (auto &x: adj[i]) cout << x << " ";
-        cout << "\n";
+        for (ll j=0; j<adj[i].size(); j++) cout << adj[i][j] << " ";
+        cout << '\n';
       }
-      cout << "--------\n";
+      cout << "\n--------\n";
 #endif
+      ll l = min_distance(adj);
+#ifdef NDEBUG
+      cout << l << '\n';
+#endif
+      res.push_back(l);
     }
     return res;
   }
@@ -55,7 +74,7 @@ void solve() {
   Solution solve{};
   auto v = solve.shortestDistanceAfterQueries(n, arr);
   for (auto &x: v) cout << x << " ";
-  cout << '\n';
+  cout << "\n=============\n";
 }
 
 int32_t main(void) {
