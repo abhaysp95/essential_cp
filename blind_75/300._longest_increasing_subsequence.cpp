@@ -23,20 +23,24 @@ inline int nxt(istream& cin = std::cin) {
 
 class Solution {
   using ll=long long;
+  unordered_map<string, int> umap{};
 public:
-  // recursive solution works but will give TLE
+  // memoized solution works but gives TLE
   ll max_length(vector<int>& nums, ll idx, ll prev) {
     if (idx==nums.size()) {
       return 0;
     }
+    string key = to_string(idx) + "_" + to_string(prev);
+    if (umap.find(key)!=umap.end()) return umap[key];
     ll maxl=0;
-    if (prev==-1||prev<nums[idx]) {
+    if (prev==-1e5||prev<nums[idx]) {
       maxl=max(1+max_length(nums, idx+1, nums[idx]), max_length(nums, idx+1, prev));
     }
-    return max(maxl, max_length(nums, idx+1, prev));
+    return umap[key]=max(maxl, max_length(nums, idx+1, prev));
   }
   int lengthOfLIS(vector<int>& nums) {
-    return max_length(nums, 0, -1);
+    // -1e5 for prev, because -1e4 <= nums[i] <= 1e4
+    return max_length(nums, 0, -1e5);
   }
 };
 
