@@ -23,19 +23,21 @@ inline int nxt(istream& cin = std::cin) {
 
 class Solution {
   using ll=long long;
+  vector<ll> space;
 public:
   int coin_count(vector<int>& coins, int amount) {
     if (amount==0) return 0;
+    if (this->space[amount]!=-1) return this->space[amount];
     ll min_coins=1e9;
     for (ll i=0; i<coins.size(); i++) {
       if (amount-coins[i]>=0) {
         min_coins=min((int)min_coins,1+coin_count(coins, amount-coins[i]));
       }
     }
-    return min_coins;
+    return this->space[amount]=min_coins;
   }
-  // TLE
   int coinChange(vector<int>& coins, int amount) {
+    this->space.resize(amount+1, -1);
     ll ret=coin_count(coins, amount);
     return ret==1e9?-1:ret;
   }
